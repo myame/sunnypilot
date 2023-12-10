@@ -145,33 +145,7 @@ class Uploader:
     return None
 
   def do_upload(self, key: str, fn: str) -> None:
-    try:
-      url_resp = self.api.get("v1.4/" + self.dongle_id + "/upload_url/", timeout=10, path=key, access_token=self.api.get_token())
-      if url_resp.status_code == 412:
-        self.last_resp = url_resp
-        return
-
-      url_resp_json = json.loads(url_resp.text)
-      url = url_resp_json['url']
-      headers = url_resp_json['headers']
-      cloudlog.debug("upload_url v1.4 %s %s", url, str(headers))
-
-      if fake_upload:
-        cloudlog.debug(f"*** WARNING, THIS IS A FAKE UPLOAD TO {url} ***")
-        self.last_resp = FakeResponse()
-      else:
-        with open(fn, "rb") as f:
-          data: BinaryIO
-          if key.endswith('.bz2') and not fn.endswith('.bz2'):
-            compressed = bz2.compress(f.read())
-            data = io.BytesIO(compressed)
-          else:
-            data = f
-
-          self.last_resp = requests.put(url, data=data, headers=headers, timeout=10)
-    except Exception as e:
-      self.last_exc = (e, traceback.format_exc())
-      raise
+    return
 
   def normal_upload(self, key: str, fn: str) -> Optional[UploadResponse]:
     self.last_resp = None
